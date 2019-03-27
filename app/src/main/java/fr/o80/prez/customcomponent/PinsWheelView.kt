@@ -7,7 +7,6 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
 import kotlin.math.min
-import android.graphics.RadialGradient
 import android.graphics.*
 
 
@@ -19,9 +18,9 @@ private const val STROKE_PERCENT = 0.05f
  * @author Olivier Perez
  */
 class PinsWheelView @JvmOverloads constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-        defStyleAttr: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
     private lateinit var backgroundPaint: Paint
@@ -51,9 +50,19 @@ class PinsWheelView @JvmOverloads constructor(
             strokeCap = Paint.Cap.ROUND
         }
 
-        val gradient = SweepGradient(center, center,
-                intArrayOf(Color.rgb(255, 0, 0), Color.rgb(0, 0, 255)),
-                floatArrayOf((0f + START_ANGLE) / 360f, (360f - START_ANGLE - START_ANGLE) / 360f))
+        val gradient = SweepGradient(
+            center, center,
+            intArrayOf(
+                Color.rgb(255, 0, 0),
+                Color.rgb(0, 255, 0),
+                Color.rgb(0, 0, 255)
+            ),
+            floatArrayOf(
+                0f,
+                0.5f,
+                1f
+            )
+        )
 
         arcPaint = Paint().apply {
             shader = gradient
@@ -84,14 +93,14 @@ class PinsWheelView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         canvas.rotate(90f, center, center)
         canvas.drawArc(
-                left.toFloat() + wheelMargin,
-                top.toFloat() + wheelMargin,
-                right.toFloat() - wheelMargin,
-                bottom.toFloat() - wheelMargin,
-                START_ANGLE,
-                360f - START_ANGLE - START_ANGLE,
-                false,
-                arcPaint
+            left.toFloat() + wheelMargin,
+            top.toFloat() + wheelMargin,
+            right.toFloat() - wheelMargin,
+            bottom.toFloat() - wheelMargin,
+            START_ANGLE,
+            360f - START_ANGLE - START_ANGLE,
+            false,
+            arcPaint
         )
     }
 }
