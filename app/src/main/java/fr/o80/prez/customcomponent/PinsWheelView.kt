@@ -29,7 +29,12 @@ class PinsWheelView @JvmOverloads constructor(
     private var center: Float = 0f
     private var wheelMargin: Float = 0f
 
-    private var progress = 65f / 100f
+    var progress = 1f
+        set(value) {
+            if (value < 0f || value > 1f) throw IllegalArgumentException("Progress must be between 0f and 1f")
+            field = value
+            invalidate()
+        }
 
     init {
         if (!isInEditMode) {
