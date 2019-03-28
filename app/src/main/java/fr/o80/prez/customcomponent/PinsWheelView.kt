@@ -1,13 +1,10 @@
 package fr.o80.prez.customcomponent
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import kotlin.math.min
-import android.graphics.*
 
 
 private const val START_ANGLE = 30f
@@ -25,9 +22,14 @@ class PinsWheelView @JvmOverloads constructor(
 
     private lateinit var backgroundPaint: Paint
     private lateinit var arcPaint: Paint
+    private lateinit var disabledPaint: Paint
+    private lateinit var clearPaint: Paint
+
     private var size: Float = 0f
     private var center: Float = 0f
     private var wheelMargin: Float = 0f
+
+    private var progress = 65f / 100f
 
     init {
         if (!isInEditMode) {
@@ -40,7 +42,7 @@ class PinsWheelView @JvmOverloads constructor(
         // TODO Read attrs
     }
 
-    private fun setupPaints(strokeWith: Float) {
+    private fun setupPaints(wheelStrokeWidth: Float) {
         backgroundPaint = Paint().apply {
             color = Color.GREEN
             isAntiAlias = true
@@ -68,10 +70,25 @@ class PinsWheelView @JvmOverloads constructor(
             shader = gradient
             isDither = true
             isAntiAlias = true
-            strokeWidth = strokeWith
+            strokeWidth = wheelStrokeWidth
             style = Paint.Style.STROKE
             strokeJoin = Paint.Join.ROUND
             strokeCap = Paint.Cap.ROUND
+        }
+
+        disabledPaint = Paint().apply {
+            color = Color.rgb(170, 170, 170)
+            isDither = true
+            isAntiAlias = true
+            strokeWidth = wheelStrokeWidth + 5
+            style = Paint.Style.STROKE
+            xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP)
+        }
+
+        clearPaint = Paint().apply {
+            color = Color.WHITE
+            strokeWidth = 1f
+            style = Paint.Style.FILL
         }
     }
 
@@ -91,7 +108,11 @@ class PinsWheelView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        canvas.saveLayer(0f, 0f, right.toFloat(), bottom.toFloat(), clearPaint)
         canvas.rotate(90f, center, center)
+
+        // Draw colored wheel
         canvas.drawArc(
             left.toFloat() + wheelMargin,
             top.toFloat() + wheelMargin,
@@ -101,6 +122,20 @@ class PinsWheelView @JvmOverloads constructor(
             360f - START_ANGLE - START_ANGLE,
             false,
             arcPaint
+        )
+
+        // Draw grayed wheel regarding the progress
+        val x = 5f
+        val wheelLength = (360f - 2 * START_ANGLE) + 2 * x
+        canvas.drawArc(
+            left.toFloat() + wheelMargin,
+            top.toFloat() + wheelMargin,
+            right.toFloat() - wheelMargin,
+            bottom.toFloat() - wheelMargin,
+            progress * wheelLength + START_ANGLE - x,
+            wheelLength - progress * wheelLength,
+            false,
+            disabledPaint
         )
     }
 }
